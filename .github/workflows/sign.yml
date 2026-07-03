@@ -23,6 +23,14 @@ jobs:
           set -euo pipefail
           plutil -convert binary1 "drafts/YT Grab.xml" -o "YT Grab.unsigned.shortcut"
 
+      - name: Diagnose shortcuts sign options
+        run: |
+          shortcuts --help || true
+          echo "---"
+          shortcuts sign --help || true
+          echo "---"
+          defaults read MobileMeAccounts 2>&1 || true
+
       - name: Sign shortcut
         run: |
           set -euo pipefail
