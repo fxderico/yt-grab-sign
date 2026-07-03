@@ -1,0 +1,272 @@
+================================================================
+ BUILD "YT Grab" BY HAND IN THE iOS SHORTCUTS APP
+================================================================
+Why this works: shortcuts CREATED on your own iPhone never need
+signing. Signing only matters for .shortcut FILES imported from
+outside. So building it by hand = zero Mac, zero cost, done today.
+
+Time needed: ~15-20 minutes. Read this on your PC while tapping
+on the phone, or email yourself this file.
+
+----------------------------------------------------------------
+ HOW TO READ THIS GUIDE
+----------------------------------------------------------------
+- Each numbered step = one action you add. Search the action by
+  name in the "+"/search bar at the bottom of the editor.
+- Your phone is probably in Italian; approximate Italian action
+  names are in (parentheses) — they may differ slightly, search
+  a keyword if the exact name doesn't come up.
+- "MAGIC VARIABLE" = the output bubble of a previous action.
+  To insert one: tap the field, then in the bar above the
+  keyboard tap "Select Variable" (Seleziona variabile) and tap
+  the bubble under the action whose output you want.
+- INDENTATION below shows what goes INSIDE an If/Menu block.
+  When you add an If or Menu, Shortcuts auto-creates the
+  Otherwise/End markers — drag new actions BETWEEN the right
+  markers to nest them correctly. This is the #1 thing to get
+  right; everything else is just filling in fields.
+
+----------------------------------------------------------------
+ STEP 0 — Create the shortcut + Share Sheet setup
+----------------------------------------------------------------
+0.1  Shortcuts app -> "+" -> new shortcut.
+0.2  Tap the name at the top -> Rename -> "YT Grab".
+0.3  Tap the (i) info button at the bottom (or the name ->
+     details) and turn ON "Show in Share Sheet"
+     (Mostra nel foglio di condivisione).
+0.4  Tap "Share Sheet Types" / the input types row and keep
+     ONLY: URLs, Text, Safari web pages.
+0.5  Make sure "If there's no input" is set to "Continue"
+     (Continua) — NOT "Ask For". The clipboard fallback below
+     depends on this.
+0.6  Optional: tap the icon to pick a color/glyph.
+
+----------------------------------------------------------------
+ PART A — Figure out which link to use  ->  variable URLToUse
+----------------------------------------------------------------
+A1.  Add: If (Se)
+     - Tap the blue "Input" token -> choose variable
+       "Shortcut Input" (Contenuto condiviso / Input comando).
+     - Condition: "has any value" (ha un valore qualsiasi).
+
+A2.    INSIDE the If: add Set Variable (Imposta variabile)
+       - Variable name: URLToUse
+       - Value: Shortcut Input  (select it as a variable)
+
+     --- Otherwise (Altrimenti) ---
+
+A3.    Add: Get Clipboard (Ottieni appunti)
+
+A4.    Add: Match Text (Trova corrispondenza nel testo /
+       "match" in search)
+       - Text: the Clipboard magic variable (it usually
+         auto-fills with the previous output; if not, insert it)
+       - Pattern:  ^https?://\S+$
+         (type it exactly — caret, https?, ://, backslash-S,
+         plus, dollar)
+
+A5.    Add: Count (Conta)
+       - Count: Items (Elementi)
+       - Input: the Matches output from A4 (auto-fills)
+
+A6.    Add: If (Se)   [nested inside the Otherwise!]
+       - Input: the Count output from A5
+       - Condition: "is greater than" (è maggiore di) -> 0
+
+A7.        INSIDE this inner If: Set Variable
+           - Name: URLToUse
+           - Value: the Clipboard magic variable (from A3 —
+             NOT a new Get Clipboard)
+
+         --- Otherwise ---
+
+A8.        Add: Ask for Input (Richiedi input)
+           - Type: Text
+           - Prompt: Incolla un link
+
+A9.        Add: Set Variable
+           - Name: URLToUse
+           - Value: Provided Input (the Ask for Input output)
+
+       --- End inner If ---
+     --- End outer If ---
+
+CHECKPOINT: you now have URLToUse set on all three paths
+(share sheet / clipboard / typed).
+
+----------------------------------------------------------------
+ PART B — Menu: video or audio  ->  variables Mode + BodyJSON
+----------------------------------------------------------------
+B1.  Add: Choose from Menu (Scegli dal menu)
+     - Prompt: Cosa scarichi?
+     - Items: "Video" and "Solo audio" (it starts with two
+       slots — rename them).
+
+  === Under the "Video" case ===
+
+B2.  Add: Text (Testo) -> content exactly:  video
+B3.  Add: Set Variable -> name: Mode, value: the Text from B2.
+
+B4.  Add: Choose from Menu  [nested inside the Video case]
+     - Prompt: Qualità?
+     - Items (add two extra with the + on the menu action):
+       Migliore disponibile / 1080p / 720p / 480p
+
+     Under EACH quality case add TWO actions — a Text and a
+     Set Variable (name: BodyJSON, value: that Text). The Text
+     content is the JSON below, where [URLToUse] means: insert
+     the URLToUse VARIABLE (Select Variable), don't type it.
+
+     - Migliore disponibile:
+         {"url":"[URLToUse]","mode":"video","height":""}
+     - 1080p:
+         {"url":"[URLToUse]","mode":"video","height":"1080"}
+     - 720p:
+         {"url":"[URLToUse]","mode":"video","height":"720"}
+     - 480p:
+         {"url":"[URLToUse]","mode":"video","height":"480"}
+
+     Type the quotes as plain straight quotes ("). If iOS
+     autocorrects them into curly quotes “ ”, go to
+     Settings -> General -> Keyboard and turn OFF
+     "Smart Punctuation" while you build this.
+
+  === Under the "Solo audio" case ===
+
+B5.  Add: Text -> content exactly:  audio
+B6.  Add: Set Variable -> name: Mode, value: the Text from B5.
+
+B7.  Add: Choose from Menu  [nested inside the Solo audio case]
+     - Prompt: Qualità?
+     - Items: Migliore disponibile / 320 kbps / 192 kbps /
+       128 kbps
+
+     Under EACH case add TWO actions — a Text and a
+     Set Variable (name: BodyJSON, value: that Text) — same
+     pattern as the video quality menu. Text contents
+     ([URLToUse] = insert the variable):
+
+     - Migliore disponibile:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"0"}
+     - 320 kbps:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"320K"}
+     - 192 kbps:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"192K"}
+     - 128 kbps:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"128K"}
+
+     The server also accepts "256K" and "96K" if you want more
+     menu options. The strings must match EXACTLY (capital K,
+     or plain "0" for best) — anything else silently falls
+     back to best.
+     Honesty note: YouTube rarely serves audio above ~130 kbps,
+     so "320 kbps" just re-encodes into a bigger file without
+     adding real quality. "Migliore disponibile" is the sane
+     default; the lower bitrates are for saving space.
+
+  === End Menu ===
+
+----------------------------------------------------------------
+ PART C — Send the request
+----------------------------------------------------------------
+C1.  Add: Get Contents of URL (Ottieni contenuto di URL)
+     - URL:  https://fede.one/yt-dlp/v1/api
+     - Tap the arrow/Show More (Mostra altro) to expand:
+       - Method (Metodo): POST
+       - Headers (Intestazioni): add one ->
+           Key:   Content-Type
+           Value: application/json
+       - Request Body (Corpo della richiesta): File
+         -> pick the variable BodyJSON as the file.
+         (Yes, "File" — it sends the raw JSON text, which is
+         what the server expects.)
+
+C2.  Add: Get Dictionary from Input (Ottieni dizionario
+     da input)
+     - Input: Contents of URL (auto-fills).
+     NOTE: if the download is a video, this action just fails
+     to parse into a dictionary and returns nothing — that's
+     fine and expected; the next steps handle it.
+
+C3.  Add: Get Dictionary Value (Ottieni valore dizionario)
+     - Get: Value for key  ->  key:  error
+     - Dictionary: the output of C2 (auto-fills).
+
+----------------------------------------------------------------
+ PART D — Show error OR save the file
+----------------------------------------------------------------
+D1.  Add: If (Se)
+     - Input: Dictionary Value (output of C3)
+     - Condition: "has any value" (ha un valore qualsiasi)
+
+D2.    INSIDE: add Show Alert (Mostra avviso)
+       - Title: Errore
+       - Message: insert the Dictionary Value variable
+       - Turn OFF "Show Cancel Button" (Mostra pulsante Annulla)
+
+     --- Otherwise ---
+
+D3.    Add: If (Se)   [nested]
+       - Input: the variable Mode (Select Variable -> Mode)
+       - Condition: "is" (è uguale a) ->  video
+
+D4.        INSIDE: add Save to Photo Album (Salva in album
+           foto)
+           - Input: Contents of URL — IMPORTANT: it may
+             auto-fill with something else; tap the field,
+             Select Variable, and pick the "Contents of URL"
+             bubble from the C1 action.
+
+         --- Otherwise ---
+
+D5.        Add: Save File (Salva file)
+           - Input: Contents of URL (same note as D4 — select
+             the C1 magic variable explicitly)
+           - Turn OFF "Ask Where To Save" (Chiedi dove salvare)
+           - Destination path: /Downloads
+             (this is inside iCloud Drive -> Shortcuts)
+           - Turn ON "Overwrite If File Exists" (Sovrascrivi)
+
+       --- End inner If ---
+     --- End outer If ---
+
+DONE. Tap Done/Fine to save.
+
+----------------------------------------------------------------
+ TESTING (do all four)
+----------------------------------------------------------------
+T1.  Run it directly with a YouTube URL already copied to the
+     clipboard -> should skip straight to "Cosa scarichi?".
+     First run will ask permission to contact fede.one — Allow
+     (choose "Always Allow" / Consenti sempre).
+T2.  Video path: pick Video -> 480p (small/fast) -> it should
+     ask Photos permission, then the video appears in Photos.
+T3.  Audio path: pick Solo audio -> file lands in
+     Files app -> iCloud Drive -> Shortcuts -> Downloads.
+T4.  Share Sheet: open a YouTube video in the YouTube app or
+     Safari -> Share -> scroll to "YT Grab" -> should run with
+     that link without touching the clipboard.
+     (If YT Grab doesn't appear in the share sheet, re-check
+     step 0.3/0.4.)
+
+Error path sanity check: run it with a garbage link like
+https://example.com/nope — you should get the "Errore" alert
+with the server's message instead of a broken save.
+
+----------------------------------------------------------------
+ COMMON MISTAKES
+----------------------------------------------------------------
+- JSON body has curly “smart” quotes -> server rejects it.
+  Disable Smart Punctuation (see Part B) and retype the quotes.
+- Typed the URL text instead of inserting the URLToUse
+  variable -> the server literally receives "[URLToUse]".
+  The variable shows as a rounded bubble in the Text action —
+  if it looks like plain text, it IS plain text. Redo it.
+- Save actions grabbed the wrong input (e.g. Dictionary Value)
+  because "auto-fill" picks the nearest output. Both saves must
+  use the "Contents of URL" bubble from Part C1.
+- Nesting drifted: an action ended up outside its If/Menu
+  block. Collapse-check by dragging — compare against the
+  indentation in this guide.
+- Regex typo in A4: it must be  ^https?://\S+$  (capital S).
+================================================================

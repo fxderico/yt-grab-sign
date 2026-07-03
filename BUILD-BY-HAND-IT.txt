@@ -1,0 +1,286 @@
+================================================================
+ COSTRUIRE "YT Grab" A MANO NELL'APP COMANDI (iOS)
+================================================================
+Perché funziona: i comandi CREATI direttamente sul tuo iPhone
+non hanno bisogno di firma. La firma serve solo per i FILE
+.shortcut importati dall'esterno. Quindi ricostruirlo a mano =
+zero Mac, zero costi, fatto oggi.
+
+Tempo necessario: ~15-20 minuti. Leggi questa guida dal PC
+mentre lavori sul telefono, oppure mandatela via email.
+
+----------------------------------------------------------------
+ COME LEGGERE QUESTA GUIDA
+----------------------------------------------------------------
+- Ogni passo numerato = un'azione da aggiungere. Cerca l'azione
+  per nome nella barra di ricerca "+" in basso nell'editor.
+- I nomi delle azioni potrebbero differire leggermente dalla
+  tua versione di iOS: se il nome esatto non esce, cerca una
+  parola chiave (es. "dizionario", "menu", "URL").
+- "VARIABILE MAGICA" = la bolla di output di un'azione
+  precedente. Per inserirla: tocca il campo, poi nella barra
+  sopra la tastiera tocca "Seleziona variabile" e tocca la
+  bolla sotto l'azione di cui vuoi l'output.
+- L'INDENTAZIONE qui sotto mostra cosa va DENTRO un blocco
+  Se/Menu. Quando aggiungi un Se o un Menu, Comandi crea da
+  solo i marcatori Altrimenti/Fine — trascina le nuove azioni
+  TRA i marcatori giusti per annidarle correttamente. Questa è
+  la cosa più importante da azzeccare; il resto è solo
+  compilare campi.
+
+----------------------------------------------------------------
+ PASSO 0 — Creare il comando + impostare il foglio condivisione
+----------------------------------------------------------------
+0.1  App Comandi -> "+" -> nuovo comando.
+0.2  Tocca il nome in alto -> Rinomina -> "YT Grab".
+0.3  Tocca il pulsante (i) in basso (o il nome -> dettagli) e
+     attiva "Mostra nel foglio di condivisione".
+0.4  Tocca la riga dei tipi di input ("Tipi del foglio di
+     condivisione") e lascia SOLO: URL, Testo, Pagine web
+     Safari.
+0.5  Assicurati che "Se non c'è input" sia su "Continua" —
+     NON su "Richiedi". Il ripiego sugli appunti qui sotto
+     dipende da questo.
+0.6  Facoltativo: tocca l'icona per scegliere colore/simbolo.
+
+----------------------------------------------------------------
+ PARTE A — Capire quale link usare  ->  variabile URLToUse
+----------------------------------------------------------------
+A1.  Aggiungi: Se
+     - Tocca il token blu "Input" -> scegli la variabile
+       "Input comando" (l'input del foglio di condivisione).
+     - Condizione: "ha un valore qualsiasi".
+
+A2.    DENTRO il Se: aggiungi Imposta variabile
+       - Nome variabile: URLToUse
+       - Valore: Input comando (selezionalo come variabile)
+
+     --- Altrimenti ---
+
+A3.    Aggiungi: Ottieni appunti
+
+A4.    Aggiungi: Trova corrispondenza nel testo
+       (cerca "corrispondenza" o "match")
+       - Testo: la variabile magica Appunti (di solito si
+         compila da sola con l'output precedente; se no,
+         inseriscila tu)
+       - Pattern:  ^https?://\S+$
+         (scrivilo esattamente — accento circonflesso, https?,
+         ://, backslash-S maiuscola, più, dollaro)
+
+A5.    Aggiungi: Conta
+       - Conta: Elementi
+       - Input: l'output "Corrispondenze" di A4 (si compila
+         da solo)
+
+A6.    Aggiungi: Se   [annidato dentro l'Altrimenti!]
+       - Input: l'output Conteggio di A5
+       - Condizione: "è maggiore di" -> 0
+
+A7.        DENTRO questo Se interno: Imposta variabile
+           - Nome: URLToUse
+           - Valore: la variabile magica Appunti (quella di
+             A3 — NON un nuovo Ottieni appunti)
+
+         --- Altrimenti ---
+
+A8.        Aggiungi: Richiedi input
+           - Tipo: Testo
+           - Messaggio: Incolla un link
+
+A9.        Aggiungi: Imposta variabile
+           - Nome: URLToUse
+           - Valore: Input fornito (l'output di Richiedi input)
+
+       --- Fine Se interno ---
+     --- Fine Se esterno ---
+
+VERIFICA: ora URLToUse viene impostata in tutti e tre i casi
+(condivisione / appunti / digitato a mano).
+
+----------------------------------------------------------------
+ PARTE B — Menu: video o audio  ->  variabili Mode + BodyJSON
+----------------------------------------------------------------
+B1.  Aggiungi: Scegli dal menu
+     - Messaggio: Cosa scarichi?
+     - Voci: "Video" e "Solo audio" (parte con due voci —
+       rinominale).
+
+  === Sotto il caso "Video" ===
+
+B2.  Aggiungi: Testo -> contenuto, esattamente:  video
+B3.  Aggiungi: Imposta variabile -> nome: Mode, valore: il
+     Testo di B2.
+
+B4.  Aggiungi: Scegli dal menu  [annidato dentro il caso Video]
+     - Messaggio: Qualità?
+     - Voci (aggiungine due extra col + sull'azione menu):
+       Migliore disponibile / 1080p / 720p / 480p
+
+     Sotto OGNI qualità aggiungi DUE azioni — un Testo e un
+     Imposta variabile (nome: BodyJSON, valore: quel Testo).
+     Il contenuto del Testo è il JSON qui sotto, dove
+     [URLToUse] significa: inserisci la VARIABILE URLToUse
+     (Seleziona variabile), non scriverla a mano.
+
+     - Migliore disponibile:
+         {"url":"[URLToUse]","mode":"video","height":""}
+     - 1080p:
+         {"url":"[URLToUse]","mode":"video","height":"1080"}
+     - 720p:
+         {"url":"[URLToUse]","mode":"video","height":"720"}
+     - 480p:
+         {"url":"[URLToUse]","mode":"video","height":"480"}
+
+     Scrivi le virgolette come virgolette dritte normali (").
+     Se iOS le trasforma in virgolette curve “ ”, vai in
+     Impostazioni -> Generali -> Tastiera e disattiva
+     "Punteggiatura smart" mentre costruisci il comando.
+
+  === Sotto il caso "Solo audio" ===
+
+B5.  Aggiungi: Testo -> contenuto, esattamente:  audio
+B6.  Aggiungi: Imposta variabile -> nome: Mode, valore: il
+     Testo di B5.
+
+B7.  Aggiungi: Scegli dal menu  [annidato dentro il caso
+     Solo audio]
+     - Messaggio: Qualità?
+     - Voci: Migliore disponibile / 320 kbps / 192 kbps /
+       128 kbps
+
+     Sotto OGNI voce aggiungi DUE azioni — un Testo e un
+     Imposta variabile (nome: BodyJSON, valore: quel Testo) —
+     stesso schema del menu qualità video. Contenuto dei Testi
+     ([URLToUse] = inserisci la variabile):
+
+     - Migliore disponibile:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"0"}
+     - 320 kbps:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"320K"}
+     - 192 kbps:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"192K"}
+     - 128 kbps:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"128K"}
+
+     Il server accetta anche "256K" e "96K" se vuoi più voci
+     nel menu. Le stringhe devono corrispondere ESATTAMENTE
+     (K maiuscola, oppure "0" da solo per la migliore) —
+     qualsiasi altro valore ricade in silenzio sulla migliore.
+     Nota di onestà: YouTube raramente serve audio sopra i
+     ~130 kbps, quindi "320 kbps" ri-codifica in un file più
+     grosso senza aggiungere qualità vera. "Migliore
+     disponibile" è il default sensato; i bitrate più bassi
+     servono a risparmiare spazio.
+
+  === Fine Menu ===
+
+----------------------------------------------------------------
+ PARTE C — Inviare la richiesta
+----------------------------------------------------------------
+C1.  Aggiungi: Ottieni contenuto di URL
+     - URL:  https://fede.one/yt-dlp/v1/api
+     - Tocca la freccia / "Mostra altro" per espandere:
+       - Metodo: POST
+       - Intestazioni: aggiungine una ->
+           Chiave: Content-Type
+           Valore: application/json
+       - Corpo della richiesta: File
+         -> scegli la variabile BodyJSON come file.
+         (Sì, proprio "File" — invia il testo JSON grezzo,
+         che è quello che il server si aspetta.)
+
+C2.  Aggiungi: Ottieni dizionario da input
+     - Input: Contenuto di URL (si compila da solo).
+     NOTA: se il download è un video, quest'azione
+     semplicemente non riesce a interpretarlo come dizionario
+     e non restituisce nulla — è normale e previsto; i passi
+     successivi lo gestiscono.
+
+C3.  Aggiungi: Ottieni valore dizionario
+     - Ottieni: Valore per la chiave  ->  chiave:  error
+     - Dizionario: l'output di C2 (si compila da solo).
+
+----------------------------------------------------------------
+ PARTE D — Mostrare l'errore OPPURE salvare il file
+----------------------------------------------------------------
+D1.  Aggiungi: Se
+     - Input: Valore dizionario (output di C3)
+     - Condizione: "ha un valore qualsiasi"
+
+D2.    DENTRO: aggiungi Mostra avviso
+       - Titolo: Errore
+       - Messaggio: inserisci la variabile Valore dizionario
+       - Disattiva "Mostra pulsante Annulla"
+
+     --- Altrimenti ---
+
+D3.    Aggiungi: Se   [annidato]
+       - Input: la variabile Mode (Seleziona variabile -> Mode)
+       - Condizione: "è uguale a" ->  video
+
+D4.        DENTRO: aggiungi Salva in album foto
+           - Input: Contenuto di URL — IMPORTANTE: potrebbe
+             compilarsi da solo con la variabile sbagliata;
+             tocca il campo, Seleziona variabile, e scegli la
+             bolla "Contenuto di URL" dell'azione C1.
+
+         --- Altrimenti ---
+
+D5.        Aggiungi: Salva file
+           - Input: Contenuto di URL (stessa nota di D4 —
+             seleziona esplicitamente la variabile magica
+             di C1)
+           - Disattiva "Chiedi dove salvare"
+           - Percorso di destinazione: /Downloads
+             (sta dentro iCloud Drive -> Comandi)
+           - Attiva "Sovrascrivi se il file esiste"
+
+       --- Fine Se interno ---
+     --- Fine Se esterno ---
+
+FATTO. Tocca Fine per salvare.
+
+----------------------------------------------------------------
+ TEST (falli tutti e quattro)
+----------------------------------------------------------------
+T1.  Eseguilo direttamente con un URL di YouTube già copiato
+     negli appunti -> deve saltare dritto a "Cosa scarichi?".
+     Alla prima esecuzione chiederà il permesso di contattare
+     fede.one — consenti (scegli "Consenti sempre").
+T2.  Percorso video: scegli Video -> 480p (piccolo/veloce) ->
+     deve chiedere il permesso Foto, poi il video compare
+     in Foto.
+T3.  Percorso audio: scegli Solo audio -> il file finisce in
+     File -> iCloud Drive -> Comandi -> Downloads.
+T4.  Foglio di condivisione: apri un video nell'app YouTube o
+     in Safari -> Condividi -> scorri fino a "YT Grab" -> deve
+     partire con quel link senza toccare gli appunti.
+     (Se YT Grab non compare nel foglio di condivisione,
+     ricontrolla i passi 0.3/0.4.)
+
+Controllo del percorso errore: eseguilo con un link a caso
+tipo https://example.com/nope — devi vedere l'avviso "Errore"
+con il messaggio del server, non un salvataggio rotto.
+
+----------------------------------------------------------------
+ ERRORI COMUNI
+----------------------------------------------------------------
+- Il corpo JSON ha le virgolette curve "smart" -> il server lo
+  rifiuta. Disattiva Punteggiatura smart (vedi Parte B) e
+  riscrivi le virgolette.
+- Hai scritto il testo dell'URL invece di inserire la
+  variabile URLToUse -> il server riceve letteralmente
+  "[URLToUse]". La variabile appare come una bolla
+  arrotondata nell'azione Testo — se sembra testo normale,
+  È testo normale. Rifallo.
+- Le azioni di salvataggio hanno preso l'input sbagliato
+  (es. Valore dizionario) perché il riempimento automatico
+  sceglie l'output più vicino. Entrambi i salvataggi devono
+  usare la bolla "Contenuto di URL" della Parte C1.
+- Annidamento sbagliato: un'azione è finita fuori dal suo
+  blocco Se/Menu. Ricontrolla trascinando — confronta con
+  l'indentazione di questa guida.
+- Errore di battitura nella regex di A4: deve essere
+  ^https?://\S+$  (S maiuscola).
+================================================================

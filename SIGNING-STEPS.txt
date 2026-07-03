@@ -1,0 +1,184 @@
+==============================================================
+ HOW TO SIGN "YT Grab.shortcut" ON A RENTED SCALEWAY MAC MINI
+==============================================================
+Goal: get a validly-signed "YT Grab.shortcut" you can open on
+your iPhone, using a cloud Mac for ~30 minutes of actual work.
+
+Cost reality check: Apple forces a 24-hour minimum rental on
+ALL cloud Macs (Scaleway can't waive it). M1-M is EUR 0.11/hr,
+so expect ~EUR 2.64 + tax total. You are billed for 24h even
+if you only use it for 1 hour, and Scaleway will not let you
+delete the instance before the 24h mark. There is no 1-hour
+option anywhere — this is the floor.
+
+--------------------------------------------------------------
+ PHASE 0 — BEFORE creating the instance (do this first!)
+--------------------------------------------------------------
+Scaleway injects your SSH key at provisioning time. If you
+create the Mac first and add the key after, you may not be
+able to log in. So:
+
+0.1  On your PC, open PowerShell and run:
+         ssh-keygen -t ed25519
+     Press Enter at every prompt (default path, no passphrase).
+
+0.2  Show the public key:
+         Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub
+     Copy the whole line (starts with "ssh-ed25519 ...").
+
+0.3  In the Scaleway console:
+     Organization menu (top right) -> Project settings ->
+     "SSH keys" tab -> "Add SSH key" -> paste it -> save.
+
+0.4  Install a VNC viewer on Windows (needed for the one-time
+     iCloud login, which requires a GUI):
+         winget install RealVNC.VNCViewer
+     (TightVNC or TigerVNC also work.)
+
+--------------------------------------------------------------
+ PHASE 1 — Create the Mac mini
+--------------------------------------------------------------
+1.1  Scaleway console -> Bare Metal -> Apple Silicon ->
+     Create a Mac mini.
+
+1.2  Pick:
+       Zone:          PARIS 3 (or whatever has stock)
+       Config:        M1-M (cheapest, EUR 0.11/hr)
+       Commitment:    "No commitment"  <-- important, this is
+                      what prevents any auto-renewal/recurring
+                      monthly billing. You still owe the 24h
+                      minimum, but nothing beyond that unless
+                      you keep it running.
+
+1.3  Tick the checkbox (Bare Metal conditions + macOS license
+     + Apple 24h minimum) and click Create.
+
+1.4  Wait for the instance status to become "Ready"
+     (usually a few minutes, can take up to ~15).
+
+1.5  From the instance page, note down:
+       - Public IP        -> call it <IP> below
+       - Username         -> should be "m1"
+
+--------------------------------------------------------------
+ PHASE 2 — First SSH login + set a password for VNC
+--------------------------------------------------------------
+2.1  In PowerShell:
+         ssh m1@<IP>
+     Type "yes" when asked about the host fingerprint.
+     You should land in a macOS shell (prompt says m1@...).
+
+2.2  VNC login needs a real password for the m1 user, so set
+     one now (pick something you'll remember for the next hour):
+         sudo dscl . -passwd /Users/m1
+     It will ask "New Password:" — type one, press Enter.
+     (If sudo asks for m1's current password first and the
+     default doesn't work, check the instance page in the
+     Scaleway console — it shows the initial password.)
+
+2.3  Leave this SSH window open, you'll come back to it.
+
+--------------------------------------------------------------
+ PHASE 3 — VNC in and sign into iCloud (the one GUI step)
+--------------------------------------------------------------
+3.1  Open VNC Viewer on your PC and connect to:
+         <IP>:5900
+     Log in as user "m1" with the password from step 2.2.
+     You should see the macOS desktop.
+
+3.2  Apple menu () -> System Settings -> click
+     "Sign in" at the top of the sidebar (Apple Account).
+
+3.3  Sign in with YOUR Apple ID (the same iCloud account
+     that's on your iPhone).
+
+3.4  2FA: Apple will pop a code on your iPhone. Type it into
+     the Mac. If it asks for a device passcode, use your
+     iPhone's passcode.
+
+3.5  If it offers to enable FileVault / Find My / etc., say
+     NO / Not Now to everything. You only need the account
+     signed in — nothing else.
+
+3.6  IMPORTANT: do NOT enable "Find My Mac". If it got
+     enabled anyway, turn it off (System Settings -> Apple
+     Account -> iCloud -> Find My Mac -> off). Otherwise the
+     rented Mac gets Activation-Locked to your account.
+
+--------------------------------------------------------------
+ PHASE 4 — Upload the XML, convert, sign
+--------------------------------------------------------------
+4.1  On your PC, in a NEW PowerShell window:
+         scp "C:\Users\fedes\Desktop\yt-grab-sign\drafts\YT Grab.xml" m1@<IP>:~/
+
+4.2  Back in the SSH window (or `ssh m1@<IP>` again):
+         cd ~
+         plutil -convert binary1 "YT Grab.xml" -o "YT Grab.unsigned.shortcut"
+         shortcuts sign --mode anyone --input "YT Grab.unsigned.shortcut" --output "YT Grab.shortcut"
+
+4.3  If step 4.2's sign command works: done, go to 4.5.
+
+4.4  If it errors over SSH (keychain/session quirks can block
+     it in a non-GUI session): do the same thing inside VNC
+     instead — open Terminal.app on the Mac desktop
+     (Finder -> Applications -> Utilities -> Terminal) and run
+     the exact same two commands there. Signed in via GUI,
+     this will work.
+
+4.5  Sanity check it produced a real file:
+         ls -la "YT Grab.shortcut"
+     Should be non-empty (tens of KB).
+
+--------------------------------------------------------------
+ PHASE 5 — Get the signed file back to your PC
+--------------------------------------------------------------
+5.1  On your PC, in PowerShell:
+         scp m1@<IP>:"~/YT\ Grab.shortcut" "C:\Users\fedes\Desktop\YT Grab.shortcut"
+
+5.2  Get it onto your iPhone any way you like:
+       - upload it somewhere on fede.one and open the URL
+         in Safari on the iPhone, or
+       - email it to yourself and open the attachment, or
+       - iCloud Drive (icloud.com from the PC browser ->
+         upload -> open in Files app on iPhone).
+
+5.3  On the iPhone: tap the file -> it should open straight
+     into Shortcuts with an "Add Shortcut" screen (signed
+     with --mode anyone, so any device can import it).
+     Run it once to grant the permission prompts
+     (fede.one network access, Photos, etc.).
+
+--------------------------------------------------------------
+ PHASE 6 — Clean up (do NOT skip 6.1)
+--------------------------------------------------------------
+6.1  SIGN OUT OF iCLOUD on the Mac before anything else:
+     VNC in -> System Settings -> Apple Account ->
+     scroll down -> Sign Out. Decline keeping any data.
+     (This machine goes back into Scaleway's pool — you do
+     not want your Apple ID left on it.)
+
+6.2  You CANNOT delete the instance until 24h have passed
+     since creation. Set yourself a reminder. After 24h:
+     Scaleway console -> the Mac mini -> Delete.
+     Until you delete it, it keeps billing EUR 0.11/hr.
+
+6.3  Optional: flip the yt-grab-sign GitHub repo to private —
+     the GitHub Actions signing workflow is dead (can't sign
+     into iCloud on ephemeral runners) so there's no reason
+     to keep it public anymore.
+
+--------------------------------------------------------------
+ IF SOMETHING BREAKS
+--------------------------------------------------------------
+- "Permission denied (publickey)" on SSH  -> your SSH key
+  wasn't in the project before creation. Add it (step 0.3),
+  then reboot the instance from the Scaleway console (keys
+  are re-synced at boot on Apple Silicon instances).
+- VNC connects but black screen / refuses login -> make sure
+  you set the password (step 2.2) and are using user "m1".
+- "must be signed into iCloud" from shortcuts sign -> the GUI
+  login (Phase 3) didn't complete, or you're hitting the SSH
+  session quirk — use the Terminal-inside-VNC fallback (4.4).
+- "file couldn't be opened / wrong format" -> you skipped the
+  plutil conversion; sign the .unsigned.shortcut, not the XML.
+==============================================================

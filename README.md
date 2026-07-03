@@ -1,10 +1,21 @@
 # yt-grab-sign
 
-Mac-free signing pipeline for the "YT Grab" Apple Shortcut. iOS 15+ requires
-shortcuts to be cryptographically signed, and the only tool that can do that
-(`shortcuts sign`) only exists on macOS. This repo uses a free GitHub Actions
-macOS runner to sign the shortcut on demand, so importing it on iPhone doesn't
-throw a "can't verify" error.
+Source of truth for the "YT Grab" Apple Shortcut (a yt-dlp client that POSTs
+to `https://fede.one/yt-dlp/v1/api`).
+
+> **Status (2026-07): the GitHub Actions signing pipeline below DOES NOT
+> work.** `shortcuts sign` requires the Mac to be signed into iCloud, which is
+> impossible on ephemeral GitHub-hosted runners (verified empirically — see
+> the failed runs). The working path is **rebuilding the shortcut by hand
+> on-device**, which needs no signing at all:
+>
+> - `BUILD-BY-HAND.txt` — tap-by-tap build guide (English)
+> - `BUILD-BY-HAND-IT.txt` — the same guide in Italian
+> - `SIGNING-STEPS.txt` — fallback: how to sign the draft XML on a rented
+>   cloud Mac (Scaleway), if a distributable `.shortcut` file is ever needed
+>
+> `drafts/YT Grab.xml` remains the canonical description of the shortcut's
+> logic (actions, menus, JSON bodies) and is kept in sync with the API.
 
 ## How to sign a new build
 

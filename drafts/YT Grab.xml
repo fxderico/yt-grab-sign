@@ -342,7 +342,7 @@ This shortcut was created via the following user prompt:
 				<key>WFCommentActionText</key>
 				<string>Choose what to download:
 - Video sets Mode to video, then asks for a quality and builds the request body (BodyJSON).
-- Solo audio sets Mode to audio and builds the request body without a height.</string>
+- Solo audio sets Mode to audio, then asks for a bitrate and builds the request body with audioQuality.</string>
 			</dict>
 		</dict>
 		<!-- Menu: Cosa scarichi? -->
@@ -781,7 +781,54 @@ This shortcut was created via the following user prompt:
 				</dict>
 			</dict>
 		</dict>
-		<!-- Text: JSON body (audio, no height) -->
+		<!-- Comment: wiring for audio quality menu -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.comment</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFCommentActionText</key>
+				<string>Pick an audio bitrate. Each option builds the JSON body with the link and the chosen audioQuality:
+- Migliore disponibile sends "0" (best available VBR).
+- 320/192/128 kbps send the matching "NNNK" value (server whitelist; anything else falls back to best).</string>
+			</dict>
+		</dict>
+		<!-- Menu: Qualità? (audio) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.choosefrommenu</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>3F8A21C7-5E19-4B6D-9A02-7C4E85D1B3F0</string>
+				<key>WFControlFlowMode</key>
+				<integer>0</integer>
+				<key>WFMenuPrompt</key>
+				<string>Qualità?</string>
+				<key>WFMenuItems</key>
+				<array>
+					<string>Migliore disponibile</string>
+					<string>320 kbps</string>
+					<string>192 kbps</string>
+					<string>128 kbps</string>
+				</array>
+			</dict>
+		</dict>
+		<!-- Case: Migliore disponibile (audio) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.choosefrommenu</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>3F8A21C7-5E19-4B6D-9A02-7C4E85D1B3F0</string>
+				<key>WFControlFlowMode</key>
+				<integer>1</integer>
+				<key>WFMenuItemTitle</key>
+				<string>Migliore disponibile</string>
+			</dict>
+		</dict>
+		<!-- Text: JSON body (audio, best) -->
 		<dict>
 			<key>WFWorkflowActionIdentifier</key>
 			<string>is.workflow.actions.gettext</string>
@@ -804,14 +851,14 @@ This shortcut was created via the following user prompt:
 							</dict>
 						</dict>
 						<key>string</key>
-						<string>{"url":"￼","mode":"audio"}</string>
+						<string>{"url":"￼","mode":"audio","audioQuality":"0"}</string>
 					</dict>
 					<key>WFSerializationType</key>
 					<string>WFTextTokenString</string>
 				</dict>
 			</dict>
 		</dict>
-		<!-- Set BodyJSON (audio) -->
+		<!-- Set BodyJSON (audio best) -->
 		<dict>
 			<key>WFWorkflowActionIdentifier</key>
 			<string>is.workflow.actions.setvariable</string>
@@ -833,6 +880,222 @@ This shortcut was created via the following user prompt:
 					<key>WFSerializationType</key>
 					<string>WFTextTokenAttachment</string>
 				</dict>
+			</dict>
+		</dict>
+		<!-- Case: 320 kbps -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.choosefrommenu</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>3F8A21C7-5E19-4B6D-9A02-7C4E85D1B3F0</string>
+				<key>WFControlFlowMode</key>
+				<integer>1</integer>
+				<key>WFMenuItemTitle</key>
+				<string>320 kbps</string>
+			</dict>
+		</dict>
+		<!-- Text: JSON body (audio 320K) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.gettext</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>UUID</key>
+				<string>91C4E7A2-3B58-46D0-8F26-5A1D9E30C7B4</string>
+				<key>WFTextActionText</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>attachmentsByRange</key>
+						<dict>
+							<key>{8, 1}</key>
+							<dict>
+								<key>Type</key>
+								<string>Variable</string>
+								<key>VariableName</key>
+								<string>URLToUse</string>
+							</dict>
+						</dict>
+						<key>string</key>
+						<string>{"url":"￼","mode":"audio","audioQuality":"320K"}</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenString</string>
+				</dict>
+			</dict>
+		</dict>
+		<!-- Set BodyJSON (audio 320K) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.setvariable</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFVariableName</key>
+				<string>BodyJSON</string>
+				<key>WFInput</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Text</string>
+						<key>OutputUUID</key>
+						<string>91C4E7A2-3B58-46D0-8F26-5A1D9E30C7B4</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+			</dict>
+		</dict>
+		<!-- Case: 192 kbps -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.choosefrommenu</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>3F8A21C7-5E19-4B6D-9A02-7C4E85D1B3F0</string>
+				<key>WFControlFlowMode</key>
+				<integer>1</integer>
+				<key>WFMenuItemTitle</key>
+				<string>192 kbps</string>
+			</dict>
+		</dict>
+		<!-- Text: JSON body (audio 192K) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.gettext</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>UUID</key>
+				<string>4E70B3D9-8C12-45A6-9D58-1F36A2E08C91</string>
+				<key>WFTextActionText</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>attachmentsByRange</key>
+						<dict>
+							<key>{8, 1}</key>
+							<dict>
+								<key>Type</key>
+								<string>Variable</string>
+								<key>VariableName</key>
+								<string>URLToUse</string>
+							</dict>
+						</dict>
+						<key>string</key>
+						<string>{"url":"￼","mode":"audio","audioQuality":"192K"}</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenString</string>
+				</dict>
+			</dict>
+		</dict>
+		<!-- Set BodyJSON (audio 192K) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.setvariable</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFVariableName</key>
+				<string>BodyJSON</string>
+				<key>WFInput</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Text</string>
+						<key>OutputUUID</key>
+						<string>4E70B3D9-8C12-45A6-9D58-1F36A2E08C91</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+			</dict>
+		</dict>
+		<!-- Case: 128 kbps -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.choosefrommenu</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>3F8A21C7-5E19-4B6D-9A02-7C4E85D1B3F0</string>
+				<key>WFControlFlowMode</key>
+				<integer>1</integer>
+				<key>WFMenuItemTitle</key>
+				<string>128 kbps</string>
+			</dict>
+		</dict>
+		<!-- Text: JSON body (audio 128K) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.gettext</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>UUID</key>
+				<string>7A15D8C3-2F94-40B7-A6E3-8D50C1B92F46</string>
+				<key>WFTextActionText</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>attachmentsByRange</key>
+						<dict>
+							<key>{8, 1}</key>
+							<dict>
+								<key>Type</key>
+								<string>Variable</string>
+								<key>VariableName</key>
+								<string>URLToUse</string>
+							</dict>
+						</dict>
+						<key>string</key>
+						<string>{"url":"￼","mode":"audio","audioQuality":"128K"}</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenString</string>
+				</dict>
+			</dict>
+		</dict>
+		<!-- Set BodyJSON (audio 128K) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.setvariable</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFVariableName</key>
+				<string>BodyJSON</string>
+				<key>WFInput</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Text</string>
+						<key>OutputUUID</key>
+						<string>7A15D8C3-2F94-40B7-A6E3-8D50C1B92F46</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+			</dict>
+		</dict>
+		<!-- End Menu: Qualità (audio) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.choosefrommenu</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>3F8A21C7-5E19-4B6D-9A02-7C4E85D1B3F0</string>
+				<key>WFControlFlowMode</key>
+				<integer>2</integer>
 			</dict>
 		</dict>
 		<!-- End Menu: Cosa scarichi -->
@@ -868,7 +1131,7 @@ This shortcut was created via the following user prompt:
 				<key>UUID</key>
 				<string>4464999B-2FFA-4756-9DCD-12CA781C8C42</string>
 				<key>WFURL</key>
-				<string>https://fede.one/yt-dlp/api/shortcut</string>
+				<string>https://fede.one/yt-dlp/v1/api</string>
 				<key>WFHTTPMethod</key>
 				<string>POST</string>
 				<key>WFHTTPBodyType</key>
