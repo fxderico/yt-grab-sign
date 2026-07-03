@@ -18,10 +18,15 @@ jobs:
             exit 1
           fi
 
+      - name: Convert plist XML to binary plist
+        run: |
+          set -euo pipefail
+          plutil -convert binary1 "drafts/YT Grab.xml" -o "YT Grab.unsigned.shortcut"
+
       - name: Sign shortcut
         run: |
           set -euo pipefail
-          shortcuts sign --mode anyone --input "drafts/YT Grab.xml" --output "YT Grab.shortcut"
+          shortcuts sign --mode anyone --input "YT Grab.unsigned.shortcut" --output "YT Grab.shortcut"
 
       - name: Verify signed output exists and is non-empty
         run: |
