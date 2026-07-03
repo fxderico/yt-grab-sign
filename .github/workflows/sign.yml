@@ -1,0 +1,39 @@
+name: Sign YT Grab Shortcut
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  sign:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Verify input file exists
+        run: |
+          set -euo pipefail
+          if [ ! -f "drafts/YT Grab.xml" ]; then
+            echo "::error::drafts/YT Grab.xml not found. Nothing to sign."
+            exit 1
+          fi
+
+      - name: Sign shortcut
+        run: |
+          set -euo pipefail
+          shortcuts sign --mode anyone --input "drafts/YT Grab.xml" --output "YT Grab.shortcut"
+
+      - name: Verify signed output exists and is non-empty
+        run: |
+          set -euo pipefail
+          if [ ! -s "YT Grab.shortcut" ]; then
+            echo "::error::YT Grab.shortcut was not produced or is empty."
+            exit 1
+          fi
+
+      - name: Upload signed shortcut artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yt-grab-shortcut
+          path: YT Grab.shortcut
+          if-no-files-found: error
