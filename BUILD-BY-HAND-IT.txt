@@ -179,7 +179,7 @@ B7.  Aggiungi: Scegli dal menu  [annidato dentro il caso
  PARTE C — Inviare la richiesta
 ----------------------------------------------------------------
 C1.  Aggiungi: Ottieni contenuto di URL
-     - URL:  https://fede.one/yt-dlp/v1/api
+     - URL:  https://yt.fede.one/v1/api
      - Tocca la freccia / "Mostra altro" per espandere:
        - Metodo: POST
        - Intestazioni: aggiungine una ->

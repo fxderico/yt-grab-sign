@@ -1131,7 +1131,7 @@ This shortcut was created via the following user prompt:
 				<key>UUID</key>
 				<string>4464999B-2FFA-4756-9DCD-12CA781C8C42</string>
 				<key>WFURL</key>
-				<string>https://fede.one/yt-dlp/v1/api</string>
+				<string>https://yt.fede.one/v1/api</string>
 				<key>WFHTTPMethod</key>
 				<string>POST</string>
 				<key>WFHTTPBodyType</key>

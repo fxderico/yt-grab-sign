@@ -1,7 +1,8 @@
 # yt-grab-sign
 
 Source of truth for the "YT Grab" Apple Shortcut (a yt-dlp client that POSTs
-to `https://fede.one/yt-dlp/v1/api`).
+to `https://yt.fede.one/v1/api`; `https://fede.one/yt-dlp/api/shortcut` is the
+same handler on the old host and also works).
 
 > **Status (2026-07): the GitHub Actions signing pipeline below DOES NOT
 > work.** `shortcuts sign` requires the Mac to be signed into iCloud, which is

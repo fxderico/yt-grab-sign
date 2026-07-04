@@ -170,7 +170,7 @@ B7.  Add: Choose from Menu  [nested inside the Solo audio case]
  PART C — Send the request
 ----------------------------------------------------------------
 C1.  Add: Get Contents of URL (Ottieni contenuto di URL)
-     - URL:  https://fede.one/yt-dlp/v1/api
+     - URL:  https://yt.fede.one/v1/api
      - Tap the arrow/Show More (Mostra altro) to expand:
        - Method (Metodo): POST
        - Headers (Intestazioni): add one ->
