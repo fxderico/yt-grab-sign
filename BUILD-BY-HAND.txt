@@ -110,16 +110,14 @@ B3.  Add: Set Variable -> name: Mode, value: the Text from B2.
 B4.  Add: Choose from Menu  [nested inside the Video case]
      - Prompt: Qualità?
      - Items (add extras with the + on the menu action):
-       Migliore disponibile / 2160p / 1440p / 1080p / 720p /
-       480p
+       2160p / 1440p / 1080p / 720p / 480p / 360p / 240p /
+       144p
 
      Under EACH quality case add TWO actions — a Text and a
      Set Variable (name: BodyJSON, value: that Text). The Text
      content is the JSON below, where [URLToUse] means: insert
      the URLToUse VARIABLE (Select Variable), don't type it.
 
-     - Migliore disponibile:
-         {"url":"[URLToUse]","mode":"video","height":""}
      - 2160p:
          {"url":"[URLToUse]","mode":"video","height":"2160"}
      - 1440p:
@@ -130,6 +128,17 @@ B4.  Add: Choose from Menu  [nested inside the Video case]
          {"url":"[URLToUse]","mode":"video","height":"720"}
      - 480p:
          {"url":"[URLToUse]","mode":"video","height":"480"}
+     - 360p:
+         {"url":"[URLToUse]","mode":"video","height":"360"}
+     - 240p:
+         {"url":"[URLToUse]","mode":"video","height":"240"}
+     - 144p:
+         {"url":"[URLToUse]","mode":"video","height":"144"}
+
+     (2160p acts as "best available" in practice: the server
+     asks for the best stream at or below the height, so on a
+     1080p-max video every option >= 1080p gives the same
+     file.)
 
      Size warning: above 1080p YouTube serves VP9/AV1 files
      that get HUGE (a 4K video can be hundreds of MB) and the
@@ -150,8 +159,8 @@ B6.  Add: Set Variable -> name: Mode, value: the Text from B5.
 
 B7.  Add: Choose from Menu  [nested inside the Solo audio case]
      - Prompt: Qualità?
-     - Items: Migliore disponibile / 320 kbps / 192 kbps /
-       128 kbps
+     - Items: Migliore disponibile / 320 kbps / 256 kbps /
+       192 kbps / 128 kbps / 96 kbps
 
      Under EACH case add TWO actions — a Text and a
      Set Variable (name: BodyJSON, value: that Text) — same
@@ -162,15 +171,17 @@ B7.  Add: Choose from Menu  [nested inside the Solo audio case]
          {"url":"[URLToUse]","mode":"audio","audioQuality":"0"}
      - 320 kbps:
          {"url":"[URLToUse]","mode":"audio","audioQuality":"320K"}
+     - 256 kbps:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"256K"}
      - 192 kbps:
          {"url":"[URLToUse]","mode":"audio","audioQuality":"192K"}
      - 128 kbps:
          {"url":"[URLToUse]","mode":"audio","audioQuality":"128K"}
+     - 96 kbps:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"96K"}
 
-     The server also accepts "256K" and "96K" if you want more
-     menu options. The strings must match EXACTLY (capital K,
-     or plain "0" for best) — anything else silently falls
-     back to best.
+     The strings must match EXACTLY (capital K, or plain "0"
+     for best) — anything else silently falls back to best.
      Honesty note: YouTube rarely serves audio above ~130 kbps,
      so "320 kbps" just re-encodes into a bigger file without
      adding real quality. "Migliore disponibile" is the sane

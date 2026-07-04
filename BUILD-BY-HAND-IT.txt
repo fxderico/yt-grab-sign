@@ -115,8 +115,8 @@ B3.  Aggiungi: Imposta variabile -> nome: Mode, valore: il
 B4.  Aggiungi: Scegli dal menu  [annidato dentro il caso Video]
      - Messaggio: Qualità?
      - Voci (aggiungi le extra col + sull'azione menu):
-       Migliore disponibile / 2160p / 1440p / 1080p / 720p /
-       480p
+       2160p / 1440p / 1080p / 720p / 480p / 360p / 240p /
+       144p
 
      Sotto OGNI qualità aggiungi DUE azioni — un Testo e un
      Imposta variabile (nome: BodyJSON, valore: quel Testo).
@@ -124,8 +124,6 @@ B4.  Aggiungi: Scegli dal menu  [annidato dentro il caso Video]
      [URLToUse] significa: inserisci la VARIABILE URLToUse
      (Seleziona variabile), non scriverla a mano.
 
-     - Migliore disponibile:
-         {"url":"[URLToUse]","mode":"video","height":""}
      - 2160p:
          {"url":"[URLToUse]","mode":"video","height":"2160"}
      - 1440p:
@@ -136,6 +134,17 @@ B4.  Aggiungi: Scegli dal menu  [annidato dentro il caso Video]
          {"url":"[URLToUse]","mode":"video","height":"720"}
      - 480p:
          {"url":"[URLToUse]","mode":"video","height":"480"}
+     - 360p:
+         {"url":"[URLToUse]","mode":"video","height":"360"}
+     - 240p:
+         {"url":"[URLToUse]","mode":"video","height":"240"}
+     - 144p:
+         {"url":"[URLToUse]","mode":"video","height":"144"}
+
+     (2160p fa in pratica da "migliore disponibile": il server
+     chiede il miglior flusso a quell'altezza o sotto, quindi
+     su un video max 1080p ogni opzione >= 1080p dà lo stesso
+     file.)
 
      Avvertenza dimensioni: sopra i 1080p YouTube serve file
      VP9/AV1 ENORMI (un 4K può pesare centinaia di MB) e la
@@ -158,8 +167,8 @@ B6.  Aggiungi: Imposta variabile -> nome: Mode, valore: il
 B7.  Aggiungi: Scegli dal menu  [annidato dentro il caso
      Solo audio]
      - Messaggio: Qualità?
-     - Voci: Migliore disponibile / 320 kbps / 192 kbps /
-       128 kbps
+     - Voci: Migliore disponibile / 320 kbps / 256 kbps /
+       192 kbps / 128 kbps / 96 kbps
 
      Sotto OGNI voce aggiungi DUE azioni — un Testo e un
      Imposta variabile (nome: BodyJSON, valore: quel Testo) —
@@ -170,15 +179,18 @@ B7.  Aggiungi: Scegli dal menu  [annidato dentro il caso
          {"url":"[URLToUse]","mode":"audio","audioQuality":"0"}
      - 320 kbps:
          {"url":"[URLToUse]","mode":"audio","audioQuality":"320K"}
+     - 256 kbps:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"256K"}
      - 192 kbps:
          {"url":"[URLToUse]","mode":"audio","audioQuality":"192K"}
      - 128 kbps:
          {"url":"[URLToUse]","mode":"audio","audioQuality":"128K"}
+     - 96 kbps:
+         {"url":"[URLToUse]","mode":"audio","audioQuality":"96K"}
 
-     Il server accetta anche "256K" e "96K" se vuoi più voci
-     nel menu. Le stringhe devono corrispondere ESATTAMENTE
-     (K maiuscola, oppure "0" da solo per la migliore) —
-     qualsiasi altro valore ricade in silenzio sulla migliore.
+     Le stringhe devono corrispondere ESATTAMENTE (K maiuscola,
+     oppure "0" da solo per la migliore) — qualsiasi altro
+     valore ricade in silenzio sulla migliore.
      Nota di onestà: YouTube raramente serve audio sopra i
      ~130 kbps, quindi "320 kbps" ri-codifica in un file più
      grosso senza aggiungere qualità vera. "Migliore
