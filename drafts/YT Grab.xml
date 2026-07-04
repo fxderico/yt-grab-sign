@@ -423,7 +423,7 @@ This shortcut was created via the following user prompt:
 				<key>WFCommentActionText</key>
 				<string>Pick a video quality. Each option builds the JSON body with the link and the chosen height:
 - Migliore disponibile leaves height empty.
-- 1080p, 720p and 480p set the matching height.</string>
+- 2160p, 1440p, 1080p, 720p and 480p set the matching height (yt-dlp falls back to the next best below it if unavailable).</string>
 			</dict>
 		</dict>
 		<!-- Menu: Qualità? -->
@@ -441,6 +441,8 @@ This shortcut was created via the following user prompt:
 				<key>WFMenuItems</key>
 				<array>
 					<string>Migliore disponibile</string>
+					<string>2160p</string>
+					<string>1440p</string>
 					<string>1080p</string>
 					<string>720p</string>
 					<string>480p</string>
@@ -507,6 +509,142 @@ This shortcut was created via the following user prompt:
 						<string>Text</string>
 						<key>OutputUUID</key>
 						<string>180E05F5-3647-494B-A0B0-DFB4F85C857F</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+			</dict>
+		</dict>
+		<!-- Case: 2160p -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.choosefrommenu</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>DDEC7187-882D-4222-A899-1530DB968B82</string>
+				<key>WFControlFlowMode</key>
+				<integer>1</integer>
+				<key>WFMenuItemTitle</key>
+				<string>2160p</string>
+			</dict>
+		</dict>
+		<!-- Text: JSON body (2160) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.gettext</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>UUID</key>
+				<string>C2D84F1A-6E93-4B07-A5D2-914E7C38B0F6</string>
+				<key>WFTextActionText</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>attachmentsByRange</key>
+						<dict>
+							<key>{8, 1}</key>
+							<dict>
+								<key>Type</key>
+								<string>Variable</string>
+								<key>VariableName</key>
+								<string>URLToUse</string>
+							</dict>
+						</dict>
+						<key>string</key>
+						<string>{"url":"￼","mode":"video","height":"2160"}</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenString</string>
+				</dict>
+			</dict>
+		</dict>
+		<!-- Set BodyJSON (2160) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.setvariable</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFVariableName</key>
+				<string>BodyJSON</string>
+				<key>WFInput</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Text</string>
+						<key>OutputUUID</key>
+						<string>C2D84F1A-6E93-4B07-A5D2-914E7C38B0F6</string>
+						<key>Type</key>
+						<string>ActionOutput</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenAttachment</string>
+				</dict>
+			</dict>
+		</dict>
+		<!-- Case: 1440p -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.choosefrommenu</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>GroupingIdentifier</key>
+				<string>DDEC7187-882D-4222-A899-1530DB968B82</string>
+				<key>WFControlFlowMode</key>
+				<integer>1</integer>
+				<key>WFMenuItemTitle</key>
+				<string>1440p</string>
+			</dict>
+		</dict>
+		<!-- Text: JSON body (1440) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.gettext</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>UUID</key>
+				<string>5B09E6C4-7D21-483A-BF95-3A60D8E14C72</string>
+				<key>WFTextActionText</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>attachmentsByRange</key>
+						<dict>
+							<key>{8, 1}</key>
+							<dict>
+								<key>Type</key>
+								<string>Variable</string>
+								<key>VariableName</key>
+								<string>URLToUse</string>
+							</dict>
+						</dict>
+						<key>string</key>
+						<string>{"url":"￼","mode":"video","height":"1440"}</string>
+					</dict>
+					<key>WFSerializationType</key>
+					<string>WFTextTokenString</string>
+				</dict>
+			</dict>
+		</dict>
+		<!-- Set BodyJSON (1440) -->
+		<dict>
+			<key>WFWorkflowActionIdentifier</key>
+			<string>is.workflow.actions.setvariable</string>
+			<key>WFWorkflowActionParameters</key>
+			<dict>
+				<key>WFVariableName</key>
+				<string>BodyJSON</string>
+				<key>WFInput</key>
+				<dict>
+					<key>Value</key>
+					<dict>
+						<key>OutputName</key>
+						<string>Text</string>
+						<key>OutputUUID</key>
+						<string>5B09E6C4-7D21-483A-BF95-3A60D8E14C72</string>
 						<key>Type</key>
 						<string>ActionOutput</string>
 					</dict>

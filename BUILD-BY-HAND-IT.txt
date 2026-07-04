@@ -114,8 +114,9 @@ B3.  Aggiungi: Imposta variabile -> nome: Mode, valore: il
 
 B4.  Aggiungi: Scegli dal menu  [annidato dentro il caso Video]
      - Messaggio: Qualità?
-     - Voci (aggiungine due extra col + sull'azione menu):
-       Migliore disponibile / 1080p / 720p / 480p
+     - Voci (aggiungi le extra col + sull'azione menu):
+       Migliore disponibile / 2160p / 1440p / 1080p / 720p /
+       480p
 
      Sotto OGNI qualità aggiungi DUE azioni — un Testo e un
      Imposta variabile (nome: BodyJSON, valore: quel Testo).
@@ -125,12 +126,23 @@ B4.  Aggiungi: Scegli dal menu  [annidato dentro il caso Video]
 
      - Migliore disponibile:
          {"url":"[URLToUse]","mode":"video","height":""}
+     - 2160p:
+         {"url":"[URLToUse]","mode":"video","height":"2160"}
+     - 1440p:
+         {"url":"[URLToUse]","mode":"video","height":"1440"}
      - 1080p:
          {"url":"[URLToUse]","mode":"video","height":"1080"}
      - 720p:
          {"url":"[URLToUse]","mode":"video","height":"720"}
      - 480p:
          {"url":"[URLToUse]","mode":"video","height":"480"}
+
+     Avvertenza dimensioni: sopra i 1080p YouTube serve file
+     VP9/AV1 ENORMI (un 4K può pesare centinaia di MB) e la
+     richiesta resta bloccata mentre il server scarica — se il
+     2160p va in timeout sui video lunghi, è per quello, non è
+     un bug. Se l'altezza richiesta non esiste per quel video,
+     yt-dlp prende la migliore subito sotto.
 
      Scrivi le virgolette come virgolette dritte normali (").
      Se iOS le trasforma in virgolette curve “ ”, vai in

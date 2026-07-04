@@ -109,8 +109,9 @@ B3.  Add: Set Variable -> name: Mode, value: the Text from B2.
 
 B4.  Add: Choose from Menu  [nested inside the Video case]
      - Prompt: Qualità?
-     - Items (add two extra with the + on the menu action):
-       Migliore disponibile / 1080p / 720p / 480p
+     - Items (add extras with the + on the menu action):
+       Migliore disponibile / 2160p / 1440p / 1080p / 720p /
+       480p
 
      Under EACH quality case add TWO actions — a Text and a
      Set Variable (name: BodyJSON, value: that Text). The Text
@@ -119,12 +120,23 @@ B4.  Add: Choose from Menu  [nested inside the Video case]
 
      - Migliore disponibile:
          {"url":"[URLToUse]","mode":"video","height":""}
+     - 2160p:
+         {"url":"[URLToUse]","mode":"video","height":"2160"}
+     - 1440p:
+         {"url":"[URLToUse]","mode":"video","height":"1440"}
      - 1080p:
          {"url":"[URLToUse]","mode":"video","height":"1080"}
      - 720p:
          {"url":"[URLToUse]","mode":"video","height":"720"}
      - 480p:
          {"url":"[URLToUse]","mode":"video","height":"480"}
+
+     Size warning: above 1080p YouTube serves VP9/AV1 files
+     that get HUGE (a 4K video can be hundreds of MB) and the
+     request blocks while the server downloads — if 2160p
+     times out on long videos, that's why, not a bug. If the
+     requested height doesn't exist, yt-dlp grabs the next
+     best below it.
 
      Type the quotes as plain straight quotes ("). If iOS
      autocorrects them into curly quotes “ ”, go to
